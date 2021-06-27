@@ -6,9 +6,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -23,12 +26,12 @@ import com.android.volley.toolbox.Volley;
 import java.util.HashMap;
 import java.util.Map;
 
-public class MainActivity3 extends AppCompatActivity {
+public class MainActivity3 extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
     private Button back , register;
 private TextView login;
-
+private Spinner spinner;
     private EditText username , pass , phone , email;
-    private   String str_username , str_pass , str_phone , str_email;
+    private   String str_username , str_pass , str_phone , str_email , spinner_hold;
     private CheckBox checkBox;
     private String url = "http://192.168.1.103/Myloginphp/signupa.php";
 
@@ -52,6 +55,15 @@ checkBox = findViewById(R.id.checkBoxA);
                 loginRA();
             }
         });
+
+
+        spinner = findViewById(R.id.spinnerA);
+
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
+                R.array.numbers, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
+        spinner.setOnItemSelectedListener(this);
 
         email = findViewById(R.id.emailRA);
         username = findViewById(R.id.nameRA);
@@ -77,10 +89,9 @@ checkBox = findViewById(R.id.checkBoxA);
                     Toast.makeText(MainActivity3.this, "Enter Phone Number", Toast.LENGTH_SHORT).show();
                 }
                 else if(checkBox.isChecked()) {
-                    str_username = username.getText().toString().trim();
-                    str_email = email.getText().toString().trim();
-                    str_pass = pass.getText().toString().trim();
-                    str_phone= phone.getText().toString().trim();
+
+
+                    register();
 
                     String myurl = "http://192.168.1.103/Myloginphp/signupa.php?name="+ str_username + "&email=" + str_email + "&mobile=" + str_phone + "&password=" + str_pass;
 
@@ -133,4 +144,25 @@ checkBox = findViewById(R.id.checkBoxA);
         Intent intentlogin = new Intent(this, loginAdmin.class);
         startActivity(intentlogin);
     }
+
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        spinner_hold = parent.getItemAtPosition(position).toString();
+
+
+    }
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
+
+    }
+
+    public void register(){
+        str_username = username.getText().toString().trim();
+        str_email = email.getText().toString().trim();
+        str_pass = pass.getText().toString().trim();
+
+        str_phone= phone.getText().toString().trim();
+        str_phone = spinner_hold + str_phone;
+    }
+
 }

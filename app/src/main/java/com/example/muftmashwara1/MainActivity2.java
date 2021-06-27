@@ -6,9 +6,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -23,12 +26,12 @@ import com.android.volley.toolbox.Volley;
 import java.util.HashMap;
 import java.util.Map;
 
-public class MainActivity2 extends AppCompatActivity {
+public class MainActivity2 extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
     private TextView login;
     private Button back, register;
-
+    private Spinner spinner;
     private EditText username, pass, phone, email;
-    private String str_username, str_pass, str_phone, str_email;
+    private String str_username, str_pass, str_phone, str_email, spinner_hold;
     private CheckBox checkBox;
     private String url = "http://192.168.1.103/Myloginphp/signupc.php";
 
@@ -37,7 +40,7 @@ public class MainActivity2 extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main2);
-checkBox.findViewById(R.id.checkBoxRC);
+        checkBox.findViewById(R.id.checkBoxRC);
         back = findViewById(R.id.btnBackRC);
         back.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -53,6 +56,15 @@ checkBox.findViewById(R.id.checkBoxRC);
                 loginRC();
             }
         });
+
+
+        spinner = findViewById(R.id.spinnerRC);
+
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
+                R.array.numbers, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
+        spinner.setOnItemSelectedListener(this);
 
 
         email = findViewById(R.id.emailRC);
@@ -73,11 +85,10 @@ checkBox.findViewById(R.id.checkBoxRC);
                     Toast.makeText(MainActivity2.this, "Enter Password", Toast.LENGTH_SHORT).show();
                 } else if (phone.getText().toString().equals("")) {
                     Toast.makeText(MainActivity2.this, "Enter Phone Number", Toast.LENGTH_SHORT).show();
-                } else if(checkBox.isChecked()) {
-                    str_username = username.getText().toString().trim();
-                    str_email = email.getText().toString().trim();
-                    str_pass = pass.getText().toString().trim();
-                    str_phone = phone.getText().toString().trim();
+                } else if (checkBox.isChecked()) {
+
+
+                    register();
 
                     String myurl = "http://192.168.1.103/Myloginphp/signupc.php?name=" + str_username + "&email=" + str_email + "&mobile=" + str_phone + "&password=" + str_pass;
 
@@ -108,8 +119,7 @@ checkBox.findViewById(R.id.checkBoxRC);
 
                     RequestQueue requestQueue = Volley.newRequestQueue(MainActivity2.this);
                     requestQueue.add(request);
-                }
-                else {
+                } else {
                     Toast.makeText(MainActivity2.this, "please check the check box", Toast.LENGTH_SHORT).show();
                 }
 
@@ -130,4 +140,26 @@ checkBox.findViewById(R.id.checkBoxRC);
         Intent intentlogin = new Intent(this, loginCounsellor.class);
         startActivity(intentlogin);
     }
+
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        spinner_hold = parent.getItemAtPosition(position).toString();
+
+
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
+
+    }
+
+    public void register() {
+        str_username = username.getText().toString().trim();
+        str_email = email.getText().toString().trim();
+        str_pass = pass.getText().toString().trim();
+
+        str_phone = phone.getText().toString().trim();
+        str_phone = spinner_hold + str_phone;
+    }
+
 }

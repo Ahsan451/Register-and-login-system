@@ -7,9 +7,12 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -22,30 +25,30 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
 
-
 import java.util.HashMap;
 import java.util.Map;
 
-public class MainActivity extends AppCompatActivity {
-   private TextView login;
-private Button back , register;
-private EditText username , pass , phone , email;
-private String str_username , str_pass , str_phone , str_email;
-private CheckBox checkBox;
-private String url = "http://192.168.1.103/Myloginphp/signup.php";
+public class MainActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
+    private TextView login;
+    private Button back, register;
+    private EditText username, pass, phone, email;
+    private String str_username, str_pass, str_phone, str_email, spinner_hold;
+    private CheckBox checkBox;
+    private Spinner spinner;
+    private String url = "http://192.168.1.103/Myloginphp/signup.php";
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-checkBox = findViewById(R.id.checkBoxRU);
+        checkBox = findViewById(R.id.checkBoxRU);
         back = findViewById(R.id.btnBackRU);
         back.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-back();
+                back();
             }
         });
 
@@ -56,6 +59,14 @@ back();
                 loginRU();
             }
         });
+
+        spinner = findViewById(R.id.spinnerRU);
+
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
+                R.array.numbers, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
+        spinner.setOnItemSelectedListener(this);
 
 
         email = findViewById(R.id.emailRU);
@@ -72,27 +83,20 @@ back();
                 final ProgressDialog progressDialog = new ProgressDialog(MainActivity.this);
                 progressDialog.setMessage("please wait..");
 
-                if (username.getText().toString().equals("")){
+                if (username.getText().toString().equals("")) {
                     Toast.makeText(MainActivity.this, "Enter User Name", Toast.LENGTH_SHORT).show();
-                }
-
-                else if (email.getText().toString().equals("")){
+                } else if (email.getText().toString().equals("")) {
                     Toast.makeText(MainActivity.this, "Enter Email", Toast.LENGTH_SHORT).show();
-                }
-                else if (pass.getText().toString().equals("")){
+                } else if (pass.getText().toString().equals("")) {
                     Toast.makeText(MainActivity.this, "Enter Password", Toast.LENGTH_SHORT).show();
-                }
-                else if (phone.getText().toString().equals("")){
+                } else if (phone.getText().toString().equals("")) {
                     Toast.makeText(MainActivity.this, "Enter Phone Number", Toast.LENGTH_SHORT).show();
-                }
+                } else if (checkBox.isChecked()) {
 
-                else if(checkBox.isChecked()) {
-                    str_username = username.getText().toString().trim();
-                    str_email = email.getText().toString().trim();
-                    str_pass = pass.getText().toString().trim();
-                    str_phone= phone.getText().toString().trim();
+                    register();
 
-                    String myurl = "http://192.168.1.103/Myloginphp/signup.php?name="+ str_username + "&email=" + str_email + "&mobile=" + str_phone + "&password=" + str_pass;
+
+                    String myurl = "http://192.168.1.103/Myloginphp/signup.php?name=" + str_username + "&email=" + str_email + "&mobile=" + str_phone + "&password=" + str_pass;
 
                     StringRequest request = new StringRequest(Request.Method.POST, myurl, new Response.Listener<String>() {
                         @Override
@@ -106,26 +110,24 @@ back();
                         }
                     }
 
-                    ){
+                    ) {
                         @Nullable
                         @Override
                         protected Map<String, String> getParams() throws AuthFailureError {
-                            Map<String,String> params = new HashMap<String,String>();
-params.put("username",str_username);
-params.put("email",str_email);
-        params.put("pass",str_pass);
-                params.put("phone",str_phone);
-return params;
+                            Map<String, String> params = new HashMap<String, String>();
+                            params.put("username", str_username);
+                            params.put("email", str_email);
+                            params.put("pass", str_pass);
+                            params.put("phone", str_phone);
+                            return params;
                         }
                     };
 
                     RequestQueue requestQueue = Volley.newRequestQueue(MainActivity.this);
                     requestQueue.add(request);
-                }
-                else {
+                } else {
                     Toast.makeText(MainActivity.this, "please check the check box", Toast.LENGTH_SHORT).show();
                 }
-
 
 
             }
@@ -134,13 +136,36 @@ return params;
 
     }
 
-    public void back(){
-        Intent intentback = new Intent(this , backRU.class);
+    public void back() {
+        Intent intentback = new Intent(this, backRU.class);
         startActivity(intentback);
     }
-    public void loginRU(){
-        Intent intentlogin = new Intent(this,LoginUser.class);
+
+    public void loginRU() {
+        Intent intentlogin = new Intent(this, LoginUser.class);
         startActivity(intentlogin);
+    }
+
+
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        spinner_hold = parent.getItemAtPosition(position).toString();
+
+
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
+
+    }
+
+    public void register() {
+        str_username = username.getText().toString().trim();
+        str_email = email.getText().toString().trim();
+        str_pass = pass.getText().toString().trim();
+
+        str_phone = phone.getText().toString().trim();
+        str_phone = spinner_hold + str_phone;
     }
 }
 
